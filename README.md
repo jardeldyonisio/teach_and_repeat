@@ -1,51 +1,37 @@
 # Teach and Repeat
 
-This package uses the *teach and repeat* technique to teach a certain path while the operator drives the logistics vehicle and then repeats the path autonomously. See below how you can test the package.
+This repository implements a **teach-and-repeat** navigation system for mobile robots, enabling them to follow previously taught paths autonomously.
+
+## Features
+- Supports path teaching and repetition using odometry and IMU, or a combination of map, odometry, and IMU.
+- Two path representations: dot-to-dot and Bézier curves.
+- Available for differential and tricycle-type robots.
+- The vehicle stops when an obstacle is detected below a defined threshold.
 
 ## Dependencies
-- Ubuntu;
-- [ROS Humble;](https://docs.ros.org/en/humble/Installation.html)
+- ROS 2 Humble
+- Ubuntu 22.04
 
-## Preparing the package
+## Installation
+1. Clone this repository:
+   ```
+   git clone https://github.com/jardeldyonisio/teach_and_repeat.git
+   ```
 
-Create your workspace:
-```
-mkdir -p ~/colcon_ws/src
-```
+## TODO
 
-Access the folder:
-```
-cd ~/colcon_ws/src
-```
+- Create a ".yaml" file to configure:
+  - Define the robot model;
+  - Define lookahead params.
+- Use more than one bezier curve to represent the path (bsplines);
+- Create launch files:
+  - Define path
 
-Clone this package:
-```
-git clone --recurse-submodules --remote-submodules https://github.com/lognav4-0/freedom_navigation
-```
+## Demo Videos
+Check out the teach and repeat system in action:
 
-Also, clone the package freedom_vehicle in the src folder:
-```
-https://github.com/lognav4-0/freedom_vehicle
-```
+- **Teach and Repeat using Odometry and Map**: [Watch the demo on YouTube](https://www.youtube.com/watch?v=7bjSsaD-_tI)
+- **Obstacle Detection**: [Watch the obstacle detection demo on YouTube](https://www.youtube.com/watch?v=RmauNqaVmGg)
+- **Teach and Repeat using Odometry Only**: [Watch the demo on YouTube](https://www.youtube.com/watch?v=-z7Gqplbi0U&t=5s)
 
-Compile the package:
-```
-colcon build
-```
 
-## Steps to test
-
-To teach the path use the following command:
-```
-ros2 run freedom_vehicle teach_path_coords.py
-```
-
-To repeat the path using the dot-to-dot method:
-```
-ros2 run freedom_vehicle repeat_path_coords.py
-```
-
-To repeat the path using the Bézier curve-based method:
-```
-ros2 run freedom_vehicle repeat_bezier_path.py
-```
