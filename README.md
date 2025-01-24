@@ -1,4 +1,4 @@
-# Teach and Repeat
+# Teach and Repeat using Bézier Curves
 
 This repository implements a **teach-and-repeat** navigation system for mobile robots, enabling them to follow previously taught paths autonomously.
 
