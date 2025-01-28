@@ -6,11 +6,9 @@ import rclpy
 import numpy as np
 
 from rclpy.node import Node
-from sensor_msgs.msg import LaserScan
+from nav_msgs.msg import Odometry
 from visualization_msgs.msg import Marker
 from geometry_msgs.msg import Point, Twist, PoseWithCovarianceStamped
-
-from rclpy.qos import qos_profile_sensor_data
 
 from copy_file import copy_file
 from get_jacobian import get_jacobian 
@@ -37,12 +35,11 @@ class RepeatBezierPath(Node):
 
         self.cmd_vel_pub = self.create_publisher(Twist, '/hoverboard_base_controller/cmd_vel_unstamped', 10)
 
-        self.odom_sub = self.create_subscription(PoseWithCovarianceStamped, '/amcl_pose', self.callback_odometry, 10)
-        self.scan_sub = self.create_subscription(LaserScan, 'scan', self.callback_scan, qos_profile_sensor_data)
+        self.odom_sub = self.create_subscription(Odometry, '/odometry/filtered', self.callback_odometry, 10)
 
         # Variáveis que podem ser alteradas abaixo
         # Frame id markers
-        frame_id = 'map'
+        frame_id = 'odom'
 
         # Tractor configuration
         self.tyre_radius = 0.0775
@@ -53,8 +50,6 @@ class RepeatBezierPath(Node):
         self.tractor_wheelbase = 1.04
 
         self.distance_btw_wheels = 0.41
-
-        self.is_to_stop = False
 
         # threshold_dist btw tractor and coord
         self.threshold_dist = 0.8
@@ -144,7 +139,7 @@ class RepeatBezierPath(Node):
 
         # Define número inicial de knots para a curva
         # de Bézier.
-        self.start_num_knots = 200
+        self.start_num_knots = 500
         
         # Retorna os pontos de controle para os pontos
         # enviados.
@@ -178,19 +173,7 @@ class RepeatBezierPath(Node):
 
         self.start_time = time.time()
 
-    def obstacle_stop(self, data):
-        if min(data[120:180]) < 1.0:
-            self.is_to_stop = True
-            return
-        else:
-            self.is_to_stop = False
-            return
-        
-    def callback_scan(self, msg : LaserScan):
-        self.obstacle_stop(msg.ranges)
-
-    def callback_odometry(self, msg : PoseWithCovarianceStamped):
-        print("callback")
+    def callback_odometry(self, msg : Odometry):
         self.x = msg.pose.pose.position.x
         self.y = msg.pose.pose.position.y
 
@@ -209,16 +192,7 @@ class RepeatBezierPath(Node):
         self.update()
 
     def update(self):
-        print("update")
         msg = Twist()
-
-        while self.is_to_stop:
-            #TODO: Add a log warning
-            print("Obstacle detected")
-            msg.linear.x = 0.0
-            msg.angular.z = 0.0
-            self.cmd_vel_pub.publish(msg)
-            return
         
         cost = None
         min_cost = None
@@ -271,7 +245,6 @@ class RepeatBezierPath(Node):
         msg.linear.x = (left_wheel_speed + right_wheel_speed) / 2.0  # Velocidade linear
         msg.angular.z = (right_wheel_speed - left_wheel_speed) / self.distance_btw_wheels  # Velocidade angular
 
-        print("msg.angular: ", msg.angular.z)
         self.cmd_vel_pub.publish(msg)
 
         # Atribui para a variável os pontos a frente da curva de Bézier
@@ -346,8 +319,6 @@ class RepeatBezierPath(Node):
     def generate_lookahead(self):
         dt = 1.0 / self.sim_steps
         d = dict()
-
-        print("generated lookahead")
 
         for steering_angle in np.linspace(self.min_steering, self.max_steering, self.lookahead_total_paths):
             x = 0.0

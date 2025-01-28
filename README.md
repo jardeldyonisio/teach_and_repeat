@@ -1,6 +1,13 @@
 # Teach and Repeat using Bézier Curves
 
-This repository implements a **teach-and-repeat** navigation system for mobile robots, enabling them to follow previously taught paths autonomously.
+This repository implements a **Teach and Repeat** (T&R) navigation system for mobile robots, enabling them to follow previously taught paths autonomously.
+
+## TODO
+- Create a ".yaml" file to configure:
+  - Define the robot model;
+  - Define lookahead parameters.
+- Use more than one Bézier curve to represent the path (B-splines).
+- Create launch files to define paths.
 
 ## Features
 - Supports path teaching and repetition using odometry and IMU, or a combination of map, odometry, and IMU.
@@ -35,12 +42,6 @@ To repeat a path using bezier curve method:
 ros2 launch teach_and_repeat repeat_path_coords.launch.py
 ```
 
-## TODO
-- Create a ".yaml" file to configure:
-  - Define the robot model;
-  - Define lookahead parameters.
-- Use more than one Bézier curve to represent the path (B-splines).
-- Create launch files to define paths.
 
 ## Demo Videos
 Check out the teach and repeat system in action:

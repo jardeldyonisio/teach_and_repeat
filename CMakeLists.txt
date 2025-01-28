@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(freedom_navigation)
+project(teach_and_repeat)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -18,18 +18,18 @@ endif()
 install(
   PROGRAMS
   scripts/copy_file.py
-  scripts/plot_bezier.py
+  nodes/plot_bezier.py
   scripts/get_jacobian.py
   scripts/compare_paths.py
   scripts/compress_data.py
   scripts/calculate_erro.py
-  scripts/view_path_coords.py
-  scripts/teach_path_coords.py
+  nodes/view_path_coords.py
+  nodes/teach_path_coords.py
   scripts/compare_paths_two.py
   scripts/points_at_interval.py
-  scripts/repeat_path_coords.py
+  nodes/repeat_path_coords.py
   scripts/generate_lookahead.py
-  scripts/repeat_bezier_path.py
+  nodes/repeat_bezier_path.py
   scripts/save_coords_to_file.py
   scripts/generate_bezier_curve.py
   scripts/read_coords_from_file.py
@@ -41,6 +41,24 @@ install(
   src/PiecewiseG1BezierFitPython/scripts/tang.py
   src/PiecewiseG1BezierFitPython/scripts/knots.py
   src/PiecewiseG1BezierFitPython/scripts/distEJL.py
+  src/PiecewiseG1BezierFitPython/scripts/poplt.py
+  src/PiecewiseG1BezierFitPython/scripts/ktangdt.py
+  src/PiecewiseG1BezierFitPython/scripts/segop.py
+  src/PiecewiseG1BezierFitPython/scripts/bstdst.py
+  src/PiecewiseG1BezierFitPython/scripts/opdist.py
+  src/PiecewiseG1BezierFitPython/scripts/NearestPoint.py
+  src/PiecewiseG1BezierFitPython/scripts/findClosestPoint.py
+  src/PiecewiseG1BezierFitPython/scripts/globop.py
+  src/PiecewiseG1BezierFitPython/scripts/newk.py
+  src/PiecewiseG1BezierFitPython/scripts/sod.py
+  src/PiecewiseG1BezierFitPython/scripts/unitv.py
+  src/PiecewiseG1BezierFitPython/scripts/ctpts.py
+  src/PiecewiseG1BezierFitPython/scripts/cpoints.py
+  src/PiecewiseG1BezierFitPython/scripts/DrawBezierCurve.py
+  src/PiecewiseG1BezierFitPython/scripts/isAxisHandle.py
+  src/PiecewiseG1BezierFitPython/scripts/drawPolyline.py
+  src/PiecewiseG1BezierFitPython/scripts/objf2.py
+  src/PiecewiseG1BezierFitPython/scripts/cubicBezierToPolyline.py
   src/PiecewiseG1BezierFitPython/scripts/iguess0.py
   src/PiecewiseG1BezierFitPython/scripts/BezierFitDemo.py
   DESTINATION lib/${PROJECT_NAME}
@@ -54,8 +72,12 @@ find_package(ament_cmake REQUIRED)
 
 install( DIRECTORY launch/
          DESTINATION share/${PROJECT_NAME}/launch) 
-install( DIRECTORY config/
-         DESTINATION share/${PROJECT_NAME}/config) 
+install( DIRECTORY param/
+         DESTINATION share/${PROJECT_NAME}/param)
+install( DIRECTORY rviz/
+         DESTINATION share/${PROJECT_NAME}/rviz) 
+install( DIRECTORY maps/
+         DESTINATION share/${PROJECT_NAME}/maps) 
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

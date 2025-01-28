@@ -8,7 +8,7 @@ import numpy as np
 from rclpy.node import Node
 from nav_msgs.msg import Odometry
 from visualization_msgs.msg import Marker
-from geometry_msgs.msg import Point, Twist
+from geometry_msgs.msg import Point, Twist, PoseWithCovarianceStamped
 
 from copy_file import copy_file
 from calculate_erro import calculate_erro
@@ -26,8 +26,8 @@ from create_folder_with_datetime import create_folder_with_datetime
 class Navigator(Node):
     def __init__(self):
         super().__init__('repeat_path_coords')
-        self.cmd_vel_pub = self.create_publisher(Twist, '/cmd_vel', 10)
-        self.position_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
+        self.cmd_vel_pub = self.create_publisher(Twist, '/hoverboard_velocity_controller/cmd_vel', 10)
+        self.position_sub = self.create_subscription(PoseWithCovarianceStamped, '/amcl_pose', self.odom_callback, 10)
 
         base_to_create_folder = "/home/lognav/lognav_ws/src/freedom_navigation/data/"
         path_folder_to_copy = "/home/lognav/lognav_ws/src/freedom_navigation/data/teleop_data.txt"
@@ -41,7 +41,7 @@ class Navigator(Node):
         self.coords_marker_pub = self.create_publisher(Marker, 'coords_marker', 10)
 
         self.coords_marker = Marker()
-        self.coords_marker.header.frame_id = 'odom'
+        self.coords_marker.header.frame_id = 'map'
         self.coords_marker.type = Marker.POINTS
         self.coords_marker.action = Marker.ADD
         self.coords_marker.pose.orientation.w = 1.0
@@ -60,27 +60,15 @@ class Navigator(Node):
         self.file_following_path = self.folder_path + '/following_data.txt'
 
         self.coords_during_following = []
-
-        self.Kp = 40.5
-        self.Ki = 0.375
-        self.Kd = 0.0
-        self.Ts = 0.001
-
-        self.omega = 0.0
-        self.omega_max = 1.0
-        self.omega_min = -1.0
-        self.omega_anterior = 0.0
-        
-        self.diff_yaw_anterior = 0.0
-        self.diff_yaw_antepenultimo = 0.0
         
         self.t = 0.0
 
         self.tractor_velocity = 0.05
         self.threshold_dist = 0.6
+        self.THRESHOLD_YAW = 0.4
         self.start_time = time.time()
 
-    def odom_callback(self, data: Odometry):
+    def odom_callback(self, data: PoseWithCovarianceStamped):
         msg = Twist()
 
         self.coords_marker_pub.publish(self.coords_marker)
@@ -114,15 +102,15 @@ class Navigator(Node):
         self.yaw_d = np.arctan2(self.dist_vec[1], self.dist_vec[0])
         self.diff_yaw = self.yaw_d - self.yaw
         
-        omega = self.omega_anterior + (self.Kp + self.Kd/self.Ts) * self.diff_yaw - (self.Kp - self.Ki*self.Ts + 2*(self.Kd/self.Ts))*self.diff_yaw_anterior + (self.Kd/self.Ts)*self.diff_yaw_antepenultimo
-        
-        if (omega > self.omega_max):
-            omega = self.omega_max
-        elif (omega < self.omega_min):
-            omega = self.omega_min
-
-        msg.linear.x = self.tractor_velocity
-        msg.angular.z = omega
+        if self.diff_yaw > self.THRESHOLD_YAW:
+            msg.linear.x = .0
+            msg.angular.z = .1
+        elif self.diff_yaw < -self.THRESHOLD_YAW:
+            msg.linear.x = .0
+            msg.angular.z = -.1
+        else:
+            msg.linear.x = .1
+            msg.angular.z = .0
 
         self.cmd_vel_pub.publish(msg)
 
@@ -144,10 +132,6 @@ class Navigator(Node):
                 erro_percentual = calculate_erro(self.file_teleop_path, self.file_following_path)
 
                 self.variables = {
-                    "self.Kp": self.Kp,
-                    "self.Ki": self.Ki,
-                    "self.Kd": self.Kd,
-                    "self.Ts": self.Ts,
                     "self.tractor_velocity": self.tractor_velocity,
                     "threshold_dist": self.threshold_dist,
                     "duration_time": duration_time,
@@ -157,11 +141,6 @@ class Navigator(Node):
                 compare_paths_two(self.file_teleop_path, self.file_following_path)
 
                 sys.exit()
-
-        self.t = self.t + self.Ts
-        self.omega_anterior = omega
-        self.diff_yaw_antepenultimo = self.diff_yaw_anterior
-        self.diff_yaw_anterior = self.diff_yaw
 
 def main(args=None):
     rclpy.init(args=args)
