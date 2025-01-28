@@ -49,6 +49,7 @@ ros2 launch teach_and_repeat repeat_path_coords.launch.py
 ## Demo Videos
 Check out the teach and repeat system in action:
 
+- **Following a virtual path (Repeting process)**: [Watch the demo on YouTube](https://www.youtube.com/watch?v=crmZR9EUTow)
 - **Teach and Repeat using Odometry and Map (Simulation)**: [Watch the demo on YouTube](https://www.youtube.com/watch?v=7bjSsaD-_tI)
 - **Obstacle Detection (Simulation)**: [Watch the obstacle detection demo on YouTube](https://www.youtube.com/watch?v=RmauNqaVmGg)
 - **Teach and Repeat using Odometry Only (Simulation)**: [Watch the demo on YouTube](https://www.youtube.com/watch?v=-z7Gqplbi0U&t=5s)
