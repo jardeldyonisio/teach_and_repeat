@@ -70,14 +70,10 @@ find_package(ament_cmake REQUIRED)
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 
-install( DIRECTORY launch/
-         DESTINATION share/${PROJECT_NAME}/launch) 
-install( DIRECTORY param/
-         DESTINATION share/${PROJECT_NAME}/param)
 install( DIRECTORY rviz/
-         DESTINATION share/${PROJECT_NAME}/rviz) 
-install( DIRECTORY maps/
-         DESTINATION share/${PROJECT_NAME}/maps) 
+         DESTINATION share/${PROJECT_NAME}/rviz)
+install( DIRECTORY paths/
+         DESTINATION share/${PROJECT_NAME}/paths) 
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

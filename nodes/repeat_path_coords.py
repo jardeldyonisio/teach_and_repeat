@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+'''
+Non-updated version of the repeat_path_coords.py file
+'''
+
 import sys
 import time
 import rclpy

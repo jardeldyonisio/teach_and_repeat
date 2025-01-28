@@ -40,36 +40,34 @@ class RepeatBezierPath(Node):
         self.odom_sub = self.create_subscription(PoseWithCovarianceStamped, '/amcl_pose', self.callback_odometry, 10)
         self.scan_sub = self.create_subscription(LaserScan, 'scan', self.callback_scan, qos_profile_sensor_data)
 
-        # Variáveis que podem ser alteradas abaixo
-        # Frame id markers
+        # Frame ID. If you are using only relatyve data 
+        # (IMU, Odometry, etc) you can use 'odom'.
         frame_id = 'map'
 
-        # Tractor configuration
-        self.tyre_radius = 0.0775
-        self.max_steering = 1.0
-        self.min_steering = -1.0
-        self.tractor_angle = 0.0
+        # Constante velocity
         self.tractor_velocity = 0.2
-        self.tractor_wheelbase = 1.04
-
-        self.distance_btw_wheels = 0.41
-
-        self.is_to_stop = False
 
         # threshold_dist btw tractor and coord
         self.threshold_dist = 0.8
 
-        # Simulation
-        self.dt = 0.01
-        self.sim_steps = 100
-        
-        # Points Lookahead and Bézier Curves params
+        self.tyre_radius = 0.0775
+
+        # Distance between wheels
+        self.distance_btw_wheels = 0.41
+
+        # Future Behavior Parameters
         self.points_per_paths = 15
         self.dist_btw_points = 0.2
         self.lookahead_total_paths = 100
 
-        # Não alterar variáveis abaixo
-        # Lookahead params
+        # Simulation
+        self.dt = 0.01
+        self.sim_steps = 100
+
+        self.tractor_angle = 0.0
+        self.max_steering = 1.0
+        self.min_steering = -1.0
+        self.is_to_stop = False
         self.lookahead_updated = dict()
         self.steering_angle = 0.0
         self.tractor_position = 0.0
@@ -190,7 +188,6 @@ class RepeatBezierPath(Node):
         self.obstacle_stop(msg.ranges)
 
     def callback_odometry(self, msg : PoseWithCovarianceStamped):
-        print("callback")
         self.x = msg.pose.pose.position.x
         self.y = msg.pose.pose.position.y
 
@@ -209,7 +206,6 @@ class RepeatBezierPath(Node):
         self.update()
 
     def update(self):
-        print("update")
         msg = Twist()
 
         while self.is_to_stop:
