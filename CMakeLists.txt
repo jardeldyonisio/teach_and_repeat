@@ -26,6 +26,7 @@ install(
   nodes/view_path_coords.py
   nodes/teach_path_coords.py
   scripts/compare_paths_two.py
+  scripts/docagem.py
   scripts/points_at_interval.py
   nodes/repeat_path_coords.py
   scripts/generate_lookahead.py
@@ -36,31 +37,31 @@ install(
   scripts/save_variables_to_file.py
   scripts/compare_bezier_lookahead.py
   scripts/create_folder_with_datetime.py
-  src/PiecewiseG1BezierFitPython/scripts/pltC.py
-  src/PiecewiseG1BezierFitPython/scripts/defk.py
-  src/PiecewiseG1BezierFitPython/scripts/tang.py
-  src/PiecewiseG1BezierFitPython/scripts/knots.py
-  src/PiecewiseG1BezierFitPython/scripts/distEJL.py
-  src/PiecewiseG1BezierFitPython/scripts/poplt.py
-  src/PiecewiseG1BezierFitPython/scripts/ktangdt.py
-  src/PiecewiseG1BezierFitPython/scripts/segop.py
-  src/PiecewiseG1BezierFitPython/scripts/bstdst.py
-  src/PiecewiseG1BezierFitPython/scripts/opdist.py
-  src/PiecewiseG1BezierFitPython/scripts/NearestPoint.py
-  src/PiecewiseG1BezierFitPython/scripts/findClosestPoint.py
-  src/PiecewiseG1BezierFitPython/scripts/globop.py
-  src/PiecewiseG1BezierFitPython/scripts/newk.py
-  src/PiecewiseG1BezierFitPython/scripts/sod.py
-  src/PiecewiseG1BezierFitPython/scripts/unitv.py
-  src/PiecewiseG1BezierFitPython/scripts/ctpts.py
-  src/PiecewiseG1BezierFitPython/scripts/cpoints.py
-  src/PiecewiseG1BezierFitPython/scripts/DrawBezierCurve.py
-  src/PiecewiseG1BezierFitPython/scripts/isAxisHandle.py
-  src/PiecewiseG1BezierFitPython/scripts/drawPolyline.py
-  src/PiecewiseG1BezierFitPython/scripts/objf2.py
-  src/PiecewiseG1BezierFitPython/scripts/cubicBezierToPolyline.py
-  src/PiecewiseG1BezierFitPython/scripts/iguess0.py
-  src/PiecewiseG1BezierFitPython/scripts/BezierFitDemo.py
+  src/PiecewiseG1BezierFit/scripts/pltC.py
+  src/PiecewiseG1BezierFit/scripts/defk.py
+  src/PiecewiseG1BezierFit/scripts/tang.py
+  src/PiecewiseG1BezierFit/scripts/knots.py
+  src/PiecewiseG1BezierFit/scripts/distEJL.py
+  src/PiecewiseG1BezierFit/scripts/poplt.py
+  src/PiecewiseG1BezierFit/scripts/ktangdt.py
+  src/PiecewiseG1BezierFit/scripts/segop.py
+  src/PiecewiseG1BezierFit/scripts/bstdst.py
+  src/PiecewiseG1BezierFit/scripts/opdist.py
+  src/PiecewiseG1BezierFit/scripts/NearestPoint.py
+  src/PiecewiseG1BezierFit/scripts/findClosestPoint.py
+  src/PiecewiseG1BezierFit/scripts/globop.py
+  src/PiecewiseG1BezierFit/scripts/newk.py
+  src/PiecewiseG1BezierFit/scripts/sod.py
+  src/PiecewiseG1BezierFit/scripts/unitv.py
+  src/PiecewiseG1BezierFit/scripts/ctpts.py
+  src/PiecewiseG1BezierFit/scripts/cpoints.py
+  src/PiecewiseG1BezierFit/scripts/DrawBezierCurve.py
+  src/PiecewiseG1BezierFit/scripts/isAxisHandle.py
+  src/PiecewiseG1BezierFit/scripts/drawPolyline.py
+  src/PiecewiseG1BezierFit/scripts/objf2.py
+  src/PiecewiseG1BezierFit/scripts/cubicBezierToPolyline.py
+  src/PiecewiseG1BezierFit/scripts/iguess0.py
+  src/PiecewiseG1BezierFit/scripts/BezierFitDemo.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

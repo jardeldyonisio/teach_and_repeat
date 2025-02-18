@@ -15,7 +15,7 @@ class TeachPathCoords(Node):
         self.sub = self.create_subscription(PoseWithCovarianceStamped, '/amcl_pose', self.callback, 10)
 
         self.teleop_points = []
-        self.file_path = '/home/freedom/freedom_ws/src/freedom_navigation/data/teleop_data.txt'
+        self.file_path = '/home/freedom/lognav_ws/src/lognav/teach_and_repeat/data/teleop_data.txt'
 
         print("Recording... Press CTRL + C to save coords.")
 

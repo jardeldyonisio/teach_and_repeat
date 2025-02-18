@@ -4,7 +4,7 @@
   <name>teach_and_repeat</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="pedrompinheiro@hotmail.com">hydrone2</maintainer>
+  <maintainer email="jardel.dyonisio@hotmail.com">Jardel Dyonisio</maintainer>
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>

@@ -38,7 +38,7 @@ class RepeatBezierPath(Node):
         self.cmd_vel_pub = self.create_publisher(Twist, '/hoverboard_base_controller/cmd_vel_unstamped', 10)
 
         self.odom_sub = self.create_subscription(PoseWithCovarianceStamped, '/amcl_pose', self.callback_odometry, 10)
-        self.scan_sub = self.create_subscription(LaserScan, 'scan', self.callback_scan, qos_profile_sensor_data)
+        self.scan_sub = self.create_subscription(LaserScan, 'scan2', self.callback_scan, qos_profile_sensor_data)
 
         # Frame ID. If you are using only relatyve data 
         # (IMU, Odometry, etc) you can use 'odom'.
@@ -130,14 +130,14 @@ class RepeatBezierPath(Node):
 
         # Cria a pasta com data e horário e copia os arquivos
         # necessários para essa pasta
-        base_to_create_folder = "/home/freedom/freedom_ws/src/freedom_navigation/data/"
-        path_folder_to_copy = "/home/freedom/freedom_ws/src/freedom_navigation/data/teleop_data.txt"
+        base_to_create_folder = "/home/freedom/lognav_ws/src/lognav/teach_and_repeat/data/"
+        path_folder_to_copy = "/home/freedom/lognav_ws/src/lognav/teach_and_repeat/data/teleop_data.txt"
         self.folder_path = create_folder_with_datetime(base_to_create_folder)
         copy_file(path_folder_to_copy, self.folder_path)
 
         # Coleta dados de posição de quando o veiculo
         # foi teleoperado.
-        self.file_teleop_path = '/home/freedom/freedom_ws/src/freedom_navigation/data/teleop_data.txt'
+        self.file_teleop_path = '/home/freedom/lognav_ws/src/lognav/teach_and_repeat/data/teleop_data.txt'
         teleop_path_points = read_points_from_file(self.file_teleop_path)
 
         # Define número inicial de knots para a curva
@@ -177,7 +177,7 @@ class RepeatBezierPath(Node):
         self.start_time = time.time()
 
     def obstacle_stop(self, data):
-        if min(data[120:180]) < 1.0:
+        if min(data[120:180]) < 0.2:
             self.is_to_stop = True
             return
         else:
@@ -188,6 +188,7 @@ class RepeatBezierPath(Node):
         self.obstacle_stop(msg.ranges)
 
     def callback_odometry(self, msg : PoseWithCovarianceStamped):
+        # print("Waiting for 2D pose estimation")
         self.x = msg.pose.pose.position.x
         self.y = msg.pose.pose.position.y
 
@@ -267,7 +268,6 @@ class RepeatBezierPath(Node):
         msg.linear.x = (left_wheel_speed + right_wheel_speed) / 2.0  # Velocidade linear
         msg.angular.z = (right_wheel_speed - left_wheel_speed) / self.distance_btw_wheels  # Velocidade angular
 
-        print("msg.angular: ", msg.angular.z)
         self.cmd_vel_pub.publish(msg)
 
         # Atribui para a variável os pontos a frente da curva de Bézier
@@ -342,8 +342,6 @@ class RepeatBezierPath(Node):
     def generate_lookahead(self):
         dt = 1.0 / self.sim_steps
         d = dict()
-
-        print("generated lookahead")
 
         for steering_angle in np.linspace(self.min_steering, self.max_steering, self.lookahead_total_paths):
             x = 0.0
