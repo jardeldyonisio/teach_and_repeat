@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
+#coding: utf-8
 
-import bezier
 import numpy as np
 
 def points_at_interval(bezier_curve, interval_distance):

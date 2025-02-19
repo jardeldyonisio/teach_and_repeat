@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+#coding: utf-8
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -23,7 +24,7 @@ with open(file_teleop_data, 'r') as f:
     x_teleop_data= np.array(x_teleop_data)
     y_teleop_data= np.array(y_teleop_data)
     points = np.vstack((x_teleop_data, y_teleop_data)).T
-    print("Points: ", points)
+    # print("Points: ", points)
 
 ratio_lengths = round(length_following_data / length_teleop_data, 0)
 

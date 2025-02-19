@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+#coding: utf-8
 
 import numpy as np
 from read_coords_from_file import read_points_from_file

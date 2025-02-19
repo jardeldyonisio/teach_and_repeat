@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+#coding: utf-8
 
 import numpy as np
 from save_coords_to_file import save_coords_to_file
