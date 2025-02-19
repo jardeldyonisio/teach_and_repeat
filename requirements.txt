@@ -1,0 +1,4 @@
+bezier==2024.6.20
+matplotlib==3.10.0
+transforms3d==0.4.2
+numpy==2.2.3
