@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+#coding: utf-8
 
 '''
 Non-updated version of the repeat_path_coords.py file

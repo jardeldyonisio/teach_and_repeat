@@ -18,15 +18,12 @@ endif()
 install(
   PROGRAMS
   scripts/copy_file.py
-  nodes/plot_bezier.py
   scripts/get_jacobian.py
   scripts/compare_paths.py
   scripts/compress_data.py
   scripts/calculate_erro.py
-  nodes/view_path_coords.py
   nodes/teach_path_coords.py
   scripts/compare_paths_two.py
-  scripts/docagem.py
   scripts/points_at_interval.py
   nodes/repeat_path_coords.py
   scripts/generate_lookahead.py
@@ -73,8 +70,10 @@ find_package(ament_cmake REQUIRED)
 
 install( DIRECTORY rviz/
          DESTINATION share/${PROJECT_NAME}/rviz)
-install( DIRECTORY paths/
-         DESTINATION share/${PROJECT_NAME}/paths) 
+install( DIRECTORY demonstrated_path/
+         DESTINATION share/${PROJECT_NAME}/demonstrated_path)
+install( DIRECTORY data/
+         DESTINATION share/${PROJECT_NAME}/data) 
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
+#coding: utf-8
 
+import os
 import sys
 import time
 import rclpy
@@ -25,6 +27,10 @@ from read_coords_from_file import read_points_from_file
 from save_variables_to_file import save_variables_to_file
 from compare_bezier_lookahead import compare_bezier_lookahead
 from create_folder_with_datetime import create_folder_with_datetime
+
+#TODO: Create a marker to show the distance threshold to a coord be considered reached.
+#TODO: Receive from a yaml file the robot parameters. Like tyre radius, distance between wheels, etc.
+#TODO: Create a launch file to start the node with the parameters.
 
 class RepeatBezierPath(Node):
 
@@ -65,8 +71,8 @@ class RepeatBezierPath(Node):
         self.sim_steps = 100
 
         self.tractor_angle = 0.0
-        self.max_steering = 1.0
-        self.min_steering = -1.0
+        self.max_steering = 0.5
+        self.min_steering = -0.5
         self.is_to_stop = False
         self.lookahead_updated = dict()
         self.steering_angle = 0.0
@@ -130,14 +136,20 @@ class RepeatBezierPath(Node):
 
         # Cria a pasta com data e horário e copia os arquivos
         # necessários para essa pasta
-        base_to_create_folder = "/home/freedom/lognav_ws/src/lognav/teach_and_repeat/data/"
-        path_folder_to_copy = "/home/freedom/lognav_ws/src/lognav/teach_and_repeat/data/teleop_data.txt"
+
+        # When use path absolute the path is on install folder, so joint there
+        # and go back to the root folder of the project
+        ws_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../.."))
+        package_src_path = os.path.join(ws_dir, "src", "lognav", "teach_and_repeat")
+        base_to_create_folder = os.path.join(package_src_path, "data/")
+
+        path_folder_to_copy = os.path.join(base_to_create_folder, "teleop_data.txt")
         self.folder_path = create_folder_with_datetime(base_to_create_folder)
         copy_file(path_folder_to_copy, self.folder_path)
 
         # Coleta dados de posição de quando o veiculo
         # foi teleoperado.
-        self.file_teleop_path = '/home/freedom/lognav_ws/src/lognav/teach_and_repeat/data/teleop_data.txt'
+        self.file_teleop_path = os.path.join(base_to_create_folder, "teleop_data.txt")
         teleop_path_points = read_points_from_file(self.file_teleop_path)
 
         # Define número inicial de knots para a curva
@@ -176,6 +188,8 @@ class RepeatBezierPath(Node):
 
         self.start_time = time.time()
 
+        self.get_logger().info("Waiting for the 2D Pose Estimation")
+
     def obstacle_stop(self, data):
         if min(data[120:180]) < 0.2:
             self.is_to_stop = True
@@ -188,7 +202,6 @@ class RepeatBezierPath(Node):
         self.obstacle_stop(msg.ranges)
 
     def callback_odometry(self, msg : PoseWithCovarianceStamped):
-        # print("Waiting for 2D pose estimation")
         self.x = msg.pose.pose.position.x
         self.y = msg.pose.pose.position.y
 

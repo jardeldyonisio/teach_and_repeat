@@ -1,39 +1,50 @@
 # Teach and Repeat using Bézier Curves
-
-This repository implements a **Teach and Repeat** (T&R) navigation system for mobile robots, allowing them to autonomously follow previously taught paths.
+This repository implements a **Teach and Repeat** (T&R) navigation system for mobile robots, allowing them to autonomously follow previously demonstrated paths.
 <!-- TODO: Add a better description-->
 
-## TODO
-- Create a `.yaml` file to configure:
-  - The robot model;
-  - Future behavior parameters.
-- Use multiple Bézier curves (e.g., B-splines) to represent the path.
-- Update the teach node to:
-  - Accept a string input to name the path;
-  - Require a key press to start collecting poses.
-- Display poses during the teaching process.
-- Show the circular threshold around the closest Bézier reference point.
-- Automatically calculate `start_num_knots` based on the path.
-
-## Features
-- Supports relative (odometry-only, "odom" frame) and map-based teaching.
-- Two path representations: dot-to-dot and Bézier curves.
-- Compatible with differential and tricycle-type robots.
-- Automatically stops the vehicle when an obstacle is detected within a defined threshold.
-
 ## Dependencies
-- ROS 2 Humble
-- Ubuntu 22.04
+- [ROS 2 Humble](https://docs.ros.org/en/humble/Installation.html);
+- Ubuntu 22.04;
+- Colcon Common Extensions;
+- Turtlebot3 simulation;
+
+## Methods
+There are two methods to follow the demonstrated path:
+
+- **Dot-to-dot (nodes/repeat_path_coords.py)**: The robot follows a Pure Pursuit-like approach where it intercepts a look-ahead point. Once it reaches this point, a new point further along the path is set as the next target.
+- **Bezier curve based (nodes/repeat_bezier_path.py)**: The robot simulates multiple potential paths ahead using Bézier curves and selects the optimal path based on predefined criteria.
 
 ## Installation
-1. Clone this repository:
+To set up the Teach and Repeat system, follow these steps:
 
-```
-git clone --recurse-submodules https://github.com/jardeldyonisio/teach_and_repeat.git
-```
+Clone this repository along with its submodules:
+  ```zsh
+  git clone --recurse-submodules https://github.com/jardeldyonisio/teach_and_repeat.git
+  ```
+
+Make the installation script executable and run it with superuser privileges:
+  ```zsh
+  chmod +x install.sh
+  sudo ./install.sh
+  ```
+
+Initialize `rosdep` in your workspace:
+  ```zsh
+  rosdep init
+  ```
+
+Update `rosdep` to fetch the latest package information:
+  ```zsh
+  rosdep update
+  ```
+
+Install the required ROS package dependencies:
+  ```zsh
+  rosdep install --from-paths src -y --ignore-src
+  ```
 
 ## Usage
-To teach a path, ensure you run a teleop node to control the robot along the desired path. To finalize the teaching process, press `CTRL + C` to stop recording the positions:
+To demonstrate a path, ensure you run a teleop node to control the robot along the desired path. To finalize the teaching process, press `CTRL + C` to stop recording the positions:
 ```
 ros2 run teach_and_repeat teach_path_coords.py
 ```
@@ -71,3 +82,14 @@ For more details, refer to our publication [Teach and Repeat for Path Planning U
 }
 
 ```
+## TODO
+- Create a `.yaml` file to configure:
+  - The robot model;
+  - Future behavior parameters.
+- Use multiple Bézier curves (e.g., B-splines) to represent the path.
+- Update the teach node to:
+  - Accept a string input to name the path;
+  - Require a key press to start collecting poses.
+- Display poses during the teaching process.
+- Show the circular threshold around the closest Bézier reference point.
+- Automatically calculate `start_num_knots` based on the path.
