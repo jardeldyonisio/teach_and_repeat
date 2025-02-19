@@ -1,3 +1,7 @@
-*.vscode/
-*/__pycache__/
-data/
+*__pycache__*
+*.pyc
+.vscode
+logs/
+build/
+install/
+log/
