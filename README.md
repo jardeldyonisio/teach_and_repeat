@@ -43,19 +43,55 @@ Install the required ROS package dependencies:
   rosdep install --from-paths src -y --ignore-src
   ```
 
-## Usage
-To demonstrate a path, ensure you run a teleop node to control the robot along the desired path. To finalize the teaching process, press `CTRL + C` to stop recording the positions:
+## Run
+
+After setting up the environment, follow these steps to run the system:
+
+### Demonstrate Path
+
+To demonstrate a path, follow these steps:
+
+Launch the navigation system:
+```zsh
+ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py
 ```
-ros2 run teach_and_repeat teach_path_coords.py
+**You must use 'Pose2DEstimation' to define the initial position.**
+
+Open another terminal and start the teleoperation node:
+```zsh
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
 ```
-To repeat a path using dot-to-dot method:
+
+Control the robot using the following keys:
+- `I` to move forward
+- `K` to move backward
+- `J` to turn left
+- `L` to turn right
+- `Q` to increase speed
+- `Z` to decrease speed
+- `Space` to stop
+
+Start the path demonstration:
+```zsh
+ros2 launch lognav_navigation teach_path_coords
 ```
-ros2 launch teach_and_repeat repeat_bezier_path.launch.py
+To end the demonstration the user have to press CTRL + C.
+
+### Follow Path
+
+To follow a path, first ensure that the coordinates from the path demonstration are stored in the `teach_and_repeat/data/teleop_data.txt` file. This file is also the default file read during the path following process. Make sure you start from the same point where the demonstration began.
+
+If the navigation system is not already running, launch it:
+```zsh
+ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py
 ```
-To repeat a path using bezier curve method:
+
+Then, run the path following node:
+```zsh
+ros2 run teach_and_repeat repeat_bezier_path
 ```
-ros2 launch teach_and_repeat repeat_path_coords.launch.py
-```
+
+**After starting the repeat node, set a pose using '2DPoseEstimate'. The robot will immediately begin following the path.**
 
 ## Demo Videos
 Check out the teach and repeat system in action:
