@@ -10,18 +10,22 @@ class Point:
         self.y = y
 
 def save_coords_to_file(file_path, path_coords):
-    # Extrai o diretório do caminho do arquivo
-    directory = os.path.dirname(file_path)
+    """
+    @brief Save a list of coordinates to a file.
 
-    # Cria o diretório se não existir
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+    This function writes a list of coordinates to a specified file. If the file does not exist, it will be created.
+    Each coordinate is written in the format "x,y" on a new line.
 
-    print("Saving data...")  
+    @param file_path: The path to the file where coordinates will be saved.
+    @param path_coords: A list of coordinates to be saved. Each coordinate can be a Point object or a numpy array.
+    """
+    # If the file does not exist, create it.
+    if not os.path.exists(file_path):
+        open(file_path, 'w').close()
+
     with open(file_path, 'w') as file:
         for point in path_coords:
-            # Converte np.array para ponto se necessário
+            # Convert np.array to point if necessary
             if isinstance(point, np.ndarray):
                 point = Point(point[0], point[1])
             file.write('{},{}\n'.format(point.x, point.y))
-    print("All data saved.")
