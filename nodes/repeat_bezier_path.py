@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 #coding: utf-8
 
+# Author: Jardel Dyonisio (https://github.com/jardeldyonisio)
+# Official Repository: https://github.com/jardeldyonisio/teach_and_repeat
+
 import os
 import sys
 import time
@@ -41,10 +44,10 @@ class RepeatBezierPath(Node):
         self.lookahead_paths_marker_pub = self.create_publisher(Marker, 'lookahead_paths_marker', 10)
         self.selected_lookahead_path_marker_pub = self.create_publisher(Marker, 'selected_lookahead_path_marker', 10)
 
-        self.cmd_vel_pub = self.create_publisher(Twist, '/hoverboard_base_controller/cmd_vel_unstamped', 10)
+        self.cmd_vel_pub = self.create_publisher(Twist, 'cmd_vel', 10)
 
         self.odom_sub = self.create_subscription(PoseWithCovarianceStamped, '/amcl_pose', self.callback_odometry, 10)
-        self.scan_sub = self.create_subscription(LaserScan, 'scan2', self.callback_scan, qos_profile_sensor_data)
+        self.scan_sub = self.create_subscription(LaserScan, 'scan', self.callback_scan, qos_profile_sensor_data)
 
         # Frame ID. If you are using only relatyve data 
         # (IMU, Odometry, etc) you can use 'odom'.

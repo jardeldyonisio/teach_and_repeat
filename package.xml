@@ -5,11 +5,16 @@
   <version>0.0.1</version>
   <description>This package provides functionality for teaching and repeating (Teach and Repeat) navigation paths.</description>
   <maintainer email="jardel.dyonisio@hotmail.com">Jardel Dyonisio</maintainer>
-  <license>MIT</license>
+  <license>TODO: License</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <exec_depend>tf_transfomations</exec_depend>
+  <build_depend>tf_transformations</build_depend>
+  <build_depend>navigation2</build_depend>
+  <build_depend>nav2_bringup</build_depend>
+  <build_depend>turtlebot3_simulations</build_depend>
+  <build_depend>turtlebot3_gazebo</build_depend>
+  <build_depend>teleop_twist_keyboard</build_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

@@ -6,12 +6,12 @@
 
 import os
 import rclpy
-from visualization_msgs.msg import Marker
 
 from rclpy.node import Node
+from nav_msgs.msg import Odometry
+from visualization_msgs.msg import Marker
 from save_coords_to_file import save_coords_to_file
 from geometry_msgs.msg import Point, PoseWithCovarianceStamped
-from nav_msgs.msg import Odometry
 
 # TODO: Other way to finish the node.
 # TODO: Implement a way to save the path and the map name to be easier to know wich map and path was used during the teach phase.
@@ -32,11 +32,14 @@ class TeachPathCoords(Node):
 
         self.marker_pub = self.create_publisher(Marker, '/coords_marker', 10)
 
-        reference_frame = 'odom'
-        self.path_name = 'path_coords'
+        # Declare parameters
+        self.declare_parameter('reference_frame', 'map')
+        self.declare_parameter('path_name', 'path_coords')
 
-        # map_name = 'map.yaml'
-        
+        # Get parameters from launch file
+        reference_frame = self.get_parameter('reference_frame').get_parameter_value().string_value
+        self.path_name = self.get_parameter('path_name').get_parameter_value().string_value
+
         # Configure the marker
         self.marker = Marker()
         self.marker.header.frame_id = reference_frame

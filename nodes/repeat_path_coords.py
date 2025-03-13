@@ -5,6 +5,9 @@
 Non-updated version of the repeat_path_coords.py file
 '''
 
+# Author: Jardel Dyonisio (https://github.com/jardeldyonisio)
+# Official Repository: https://github.com/jardeldyonisio/teach_and_repeat
+
 import sys
 import time
 import rclpy

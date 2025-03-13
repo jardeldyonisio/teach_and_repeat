@@ -70,10 +70,14 @@ find_package(ament_cmake REQUIRED)
 
 install( DIRECTORY rviz/
          DESTINATION share/${PROJECT_NAME}/rviz)
-install( DIRECTORY demonstrated_path/
-         DESTINATION share/${PROJECT_NAME}/demonstrated_path)
 install( DIRECTORY data/
-         DESTINATION share/${PROJECT_NAME}/data) 
+         DESTINATION share/${PROJECT_NAME}/data)
+install( DIRECTORY launch/
+         DESTINATION share/${PROJECT_NAME}/launch)
+install( DIRECTORY path_saves/
+         DESTINATION share/${PROJECT_NAME}/path_saves)
+install( DIRECTORY nodes/
+         DESTINATION share/${PROJECT_NAME}/nodes) 
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

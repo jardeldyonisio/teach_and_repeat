@@ -12,7 +12,7 @@ This repository implements a **Teach and Repeat** (T&R) navigation system for mo
 There are two methods to follow the demonstrated path:
 
 - **Dot-to-dot (nodes/repeat_path_coords.py)**: The robot follows a Pure Pursuit-like approach where it intercepts a look-ahead point. Once it reaches this point, a new point further along the path is set as the next target.
-- **Bezier curve based (nodes/repeat_bezier_path.py)**: The robot simulates multiple potential paths ahead using Bézier curves and selects the optimal path based on predefined criteria.
+- **Bezier curve based (nodes/repeat_bezier_path.py)**: The robot simulates multiple potential local paths ahead using Bézier curves and selects the optimal path based on predefined criteria.
 
 ## Installation
 To set up the Teach and Repeat system, follow these steps:
@@ -47,17 +47,25 @@ Install the required ROS package dependencies:
 
 After setting up the environment, follow these steps to run the system:
 
-### Demonstrate Path
+First, export the TurtleBot3 model:
+```zsh
+export TURTLEBOT3_MODEL=burger
+```
 
-To demonstrate a path, follow these steps:
-
-Launch the navigation system:
+Launch the turtlebot world:
 ```zsh
 ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py
 ```
-**You must use 'Pose2DEstimation' to define the initial position.**
 
-Open another terminal and start the teleoperation node:
+Launch the navigation system:
+```zsh
+ros2 launch turtlebot3_navigation2 navigation2.launch.py use_sim_time:=True map:=$HOME/YOUR_WORKSPACE_NAME_HERE/src/teach_and_repeat/map/map.yaml
+```
+**You must use `Pose 2D Estimation` to define the initial position before start.**
+
+### Demonstrate Path
+
+To demonstrate a path, you can either set a `nav2 Goal` on Rviz or teleoperate the robot. To teleoperate, open another terminal and start the teleoperation node:
 ```zsh
 ros2 run teleop_twist_keyboard teleop_twist_keyboard
 ```
@@ -73,13 +81,18 @@ Control the robot using the following keys:
 
 Start the path demonstration:
 ```zsh
-ros2 launch lognav_navigation teach_path_coords
+ros2 run teach_and_repeat teach_path_coords.py --ros-args -p path_name:=path_coords -p reference_frame:=map
 ```
 To end the demonstration the user have to press CTRL + C.
 
+| Parameter         | Default Value | Description                                                                 |
+|-------------------|---------------|-----------------------------------------------------------------------------|
+| `path_name`       | `path_coords` | The name of the file where the path coordinates are stored, located in the `path_saves` folder. |
+| `reference_frame` | `map`         | The reference frame for the path points. If set to `map`, the points are relative to the map frame. If set to `odom`, the points are relative to the robot's odometry frame. |
+
 ### Follow Path
 
-To follow a path, first ensure that the coordinates from the path demonstration are stored in the `teach_and_repeat/data/teleop_data.txt` file. This file is also the default file read during the path following process. Make sure you start from the same point where the demonstration began.
+To follow a path, first ensure that the coordinates from the path demonstration are stored in the `teach_and_repeat/data/path_coords.txt` file. This file is also the default file read during the path following process. Make sure you start from the same point where the demonstration began.
 
 If the navigation system is not already running, launch it:
 ```zsh
