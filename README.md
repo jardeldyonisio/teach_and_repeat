@@ -17,31 +17,54 @@ There are two methods to follow the demonstrated path:
 ## Installation
 To set up the Teach and Repeat system, follow these steps:
 
+First, create a workspace directory and navigate into it:
+```zsh
+mkdir -p teach_repeat_ws/src
+cd teach_repeat_ws/src
+```
+
 Clone this repository along with its submodules:
-  ```zsh
-  git clone --recurse-submodules https://github.com/jardeldyonisio/teach_and_repeat.git
-  ```
+```zsh
+git clone --recurse-submodules https://github.com/jardeldyonisio/teach_and_repeat.git
+```
 
 Make the installation script executable and run it with superuser privileges:
-  ```zsh
-  chmod +x install.sh
-  sudo ./install.sh
-  ```
+```zsh
+cd teach_and_repeat/
+chmod +x install.sh
+sudo ./install.sh
+```
 
-Initialize `rosdep` in your workspace:
-  ```zsh
-  rosdep init
-  ```
+Navigate back to your workspace and, initialize `rosdep` in your workspace:
+```zsh
+cd ~/teach_repeat_ws
+rosdep init
+```
 
 Update `rosdep` to fetch the latest package information:
-  ```zsh
-  rosdep update
-  ```
+```zsh
+rosdep update
+```
 
 Install the required ROS package dependencies:
-  ```zsh
-  rosdep install --from-paths src -y --ignore-src
-  ```
+```zsh
+rosdep install --from-paths src -y --ignore-src --rosdistro humble
+```
+
+Once the dependencies are installed, proceed with building the workspace:
+```bash
+cd ~/teach_repeat_ws
+source /opt/ros/humble/setup.bash # Source ROS
+source ./install/setup.bash # Source the workspace
+colcon build
+```
+
+```zsh
+cd ~/teach_repeat_ws
+source /opt/ros/humble/setup.zsh # Source ROS
+source ./install/setup.zsh # Source the workspace
+colcon build
+```
 
 ## Run
 
@@ -57,9 +80,17 @@ Launch the turtlebot world:
 ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py
 ```
 
-Launch the navigation system:
+**Open another terminal (CTRL + ALT + T)** and launch the navigation system:
 ```zsh
-ros2 launch turtlebot3_navigation2 navigation2.launch.py use_sim_time:=True map:=$HOME/YOUR_WORKSPACE_NAME_HERE/src/teach_and_repeat/map/map.yaml
+export TURTLEBOT3_MODEL=burger
+cd ~/teach_repeat_ws
+source /opt/ros/humble/setup.zsh # Source ROS
+source ./install/setup.zsh # Source the workspace
+```
+
+Run the turtlebot navigation system:
+```zsh
+ros2 launch turtlebot3_navigation2 navigation2.launch.py use_sim_time:=True map:=$HOME/teach_repeat_ws/src/teach_and_repeat/map/map.yaml
 ```
 **You must use `Pose 2D Estimation` to define the initial position before start.**
 
@@ -79,8 +110,11 @@ Control the robot using the following keys:
 - `Z` to decrease speed
 - `Space` to stop
 
-Start the path demonstration:
+**Open another terminal (CTRL + ALT + T)** and start the path demonstration:
 ```zsh
+cd ~/teach_repeat_ws
+source /opt/ros/humble/setup.zsh # Source ROS
+source ./install/setup.bash # Source the workspace
 ros2 run teach_and_repeat teach_path_coords.py --ros-args -p path_name:=path_coords -p reference_frame:=map
 ```
 To end the demonstration the user have to press CTRL + C.
