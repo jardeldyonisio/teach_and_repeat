@@ -12,6 +12,7 @@
   <build_depend>tf_transformations</build_depend>
   <build_depend>navigation2</build_depend>
   <build_depend>nav2_bringup</build_depend>
+  <build_depend>turtlebot3_navigation2</build_depend>
   <build_depend>turtlebot3_simulations</build_depend>
   <build_depend>turtlebot3_gazebo</build_depend>
   <build_depend>teleop_twist_keyboard</build_depend>
