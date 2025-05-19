@@ -167,12 +167,14 @@ For more details, refer to our publication [Teach and Repeat for Path Planning U
 ```
 ## TODO
 - Create a `.yaml` file to configure:
-  - The robot model;
-  - Future behavior parameters.
-- Use multiple Bézier curves (e.g., B-splines) to represent the path.
+  - [ ] The robot model;
+  - [ ] Future behavior parameters (repeat node).
 - Update the teach node to:
-  - Accept a string input to name the path;
-  - Require a key press to start collecting poses.
-- Display poses during the teaching process.
-- Show the circular threshold around the closest Bézier reference point.
-- Automatically calculate `start_num_knots` based on the path.
+  - [x] Accept a string input to name the path;
+  - [x] Require a key press to start collecting poses.
+  - [x] Create a service to save path.
+- [x] Display poses during the teaching process.
+- [ ] Show the circular threshold around the closest Bézier reference point.
+- [x] Automatically calculate `start_num_knots` based on the path.
+- [ ] Adjust the repeat bezier path node to work with different path names
+- [ ] Repeat nodes do not use NumPy correctly — for example, they calculate the distance between two points without using `numpy.linalg.norm`
