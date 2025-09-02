@@ -80,7 +80,9 @@ install( DIRECTORY launch/
 install( DIRECTORY path_saves/
          DESTINATION share/${PROJECT_NAME}/path_saves)
 install( DIRECTORY nodes/
-         DESTINATION share/${PROJECT_NAME}/nodes) 
+         DESTINATION share/${PROJECT_NAME}/nodes)
+install( DIRECTORY param/
+         DESTINATION share/${PROJECT_NAME}/param) 
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

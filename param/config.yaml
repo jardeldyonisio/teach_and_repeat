@@ -1,0 +1,27 @@
+controller_server:
+  ros__parameters:
+    FollowPath:
+      frame_id: map
+      xy_goal_tolerance: 0.1
+      yaw_goal_tolerance: 0.1
+      max_distance_from_path: 0.5
+      path_to_saved_paths: /home/jardeldyonisio/teach_repeat_ws/src/teach_and_repeat/path_saves
+      use_bezier: true
+      max_vel_theta: 1.0
+      local_paths:
+        points_per_behavior_path: 15
+        distance_between_points: 0.2
+        total_local_paths: 100
+      obstacle_detection:
+        enable: true
+        scan_topic: scan
+        min_obstacle_distance: 0.5 # Minimum distance to consider an obstacle
+      tractor:
+        plugin: repeat
+        motion_model: "DiffDrive" # [DiffDrive, Ackermann]
+        # wheelbase: 1.0
+        # min_vel_x: 0.0
+        max_vel_x: 0.26
+        # min_steer_angle: -0.5
+        # max_steer_angle: 0.5
+        # consider_footprint: true
