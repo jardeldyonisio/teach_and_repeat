@@ -15,22 +15,33 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+# find dependencies
+find_package(ament_cmake REQUIRED)
+find_package(rclpy REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(visualization_msgs REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+
+# Generate interfaces
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "srv/SavePath.srv"
+  DEPENDENCIES geometry_msgs nav_msgs
+)
+
 install(
   PROGRAMS
+  scripts/utils.py
   scripts/copy_file.py
   scripts/get_jacobian.py
   scripts/compare_paths.py
-  scripts/compress_data.py
-  scripts/calculate_erro.py
   nodes/teach_path_coords.py
-  scripts/compare_paths_two.py
   scripts/points_at_interval.py
   nodes/repeat_path_coords.py
   scripts/generate_lookahead.py
   nodes/repeat_bezier_path.py
   scripts/save_coords_to_file.py
   scripts/generate_bezier_curve.py
-  scripts/read_coords_from_file.py
   scripts/save_variables_to_file.py
   scripts/compare_bezier_lookahead.py
   scripts/create_folder_with_datetime.py
@@ -62,16 +73,8 @@ install(
   DESTINATION lib/${PROJECT_NAME}
 )
 
-# find dependencies
-find_package(ament_cmake REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
-
 install( DIRECTORY rviz/
          DESTINATION share/${PROJECT_NAME}/rviz)
-install( DIRECTORY data/
-         DESTINATION share/${PROJECT_NAME}/data)
 install( DIRECTORY launch/
          DESTINATION share/${PROJECT_NAME}/launch)
 install( DIRECTORY path_saves/
@@ -90,4 +93,6 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+# Make sure to export the generated interfaces
+ament_export_dependencies(rosidl_default_runtime)
 ament_package()
