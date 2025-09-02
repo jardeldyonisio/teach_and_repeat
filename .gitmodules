@@ -1,4 +1,0 @@
-[submodule "src/PiecewiseG1BezierFit"]
-	path = src/PiecewiseG1BezierFit
-	url = https://github.com/jardeldyonisio/PiecewiseG1BezierFit.git
-	branch = single_bezier
