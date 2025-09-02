@@ -81,6 +81,13 @@ ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py
 ```
 
 **Open another terminal (CTRL + ALT + T)** and launch the navigation system:
+```bash
+export TURTLEBOT3_MODEL=burger
+cd ~/teach_repeat_ws
+source /opt/ros/humble/setup.bash # Source ROS
+source ./install/setup.bash # Source the workspace
+```
+
 ```zsh
 export TURTLEBOT3_MODEL=burger
 cd ~/teach_repeat_ws
@@ -114,7 +121,7 @@ Control the robot using the following keys:
 ```zsh
 cd ~/teach_repeat_ws
 source /opt/ros/humble/setup.zsh # Source ROS
-source ./install/setup.bash # Source the workspace
+source ./install/setup.zsh # Source the workspace
 ros2 run teach_and_repeat teach_path_coords.py --ros-args -p path_name:=path_coords -p reference_frame:=map
 ```
 To end the demonstration the user have to press CTRL + C.
@@ -178,3 +185,7 @@ For more details, refer to our publication [Teach and Repeat for Path Planning U
 - [x] Automatically calculate `start_num_knots` based on the path.
 - [ ] Adjust the repeat bezier path node to work with different path names
 - [ ] Repeat nodes do not use NumPy correctly — for example, they calculate the distance between two points without using `numpy.linalg.norm`
+- [ ] `setup.py` instead of `CMakeLists.txt`
+- [ ] C++ version;
+- [ ] Variable linear velocity
+- [ ] Create a `.yaml` config in the same pattern of nav2 stack
