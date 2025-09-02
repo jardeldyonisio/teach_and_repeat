@@ -2,23 +2,19 @@
 #coding: utf-8
 
 # Author: Jardel Dyonisio (https://github.com/jardeldyonisio)
-# Official Repository: https://github.com/jardeldyonisio/teach_and_repeat
 
 import os
 import rclpy
+import threading
 
 from rclpy.node import Node
 from nav_msgs.msg import Odometry
 from visualization_msgs.msg import Marker
 from save_coords_to_file import save_coords_to_file
 from geometry_msgs.msg import Point, PoseWithCovarianceStamped
+from teach_and_repeat.srv import SavePath
 
-# TODO: Other way to finish the node.
-# TODO: Implement a way to save the path and the map name to be easier to know wich map and path was used during the teach phase.
-# TODO: Create a folder to each path, saving the path coords, wich map was used and a image of the path in the map. This is to
-#       make easier to know wich path and wich map is in the folder.
-# TODO: A special marker to show the start and the end of the path.
-# TODO: Verify if the path name already exists, if yes and it is empty , ask if the user wants to overwrite the file or create a new one.
+# TODO: Reset the path_coords after calling the service
 
 class TeachPathCoords(Node):
     '''
@@ -34,11 +30,9 @@ class TeachPathCoords(Node):
 
         # Declare parameters
         self.declare_parameter('reference_frame', 'map')
-        self.declare_parameter('path_name', 'path_coords')
 
         # Get parameters from launch file
         reference_frame = self.get_parameter('reference_frame').get_parameter_value().string_value
-        self.path_name = self.get_parameter('path_name').get_parameter_value().string_value
 
         # Configure the marker
         self.marker = Marker()
@@ -54,35 +48,41 @@ class TeachPathCoords(Node):
         self.marker.color.a = 1.0
 
         if reference_frame == 'map':
-            self.pose_sub = self.create_subscription(PoseWithCovarianceStamped, '/amcl_pose', self.callback, 10)
+            self.pose_sub = self.create_subscription(PoseWithCovarianceStamped, 'amcl_pose', self.callback, 10)
             self.topic_msg = PoseWithCovarianceStamped()
         elif reference_frame == 'odom':
-            self.pose_sub = self.create_subscription(Odometry, '/odom', self.callback, 10)
+            self.pose_sub = self.create_subscription(Odometry, 'odom', self.callback, 10)
             self.topic_msg = Odometry()
         else:
-            # Some errors are happening here. The node is not shutting down properly.
             self.get_logger().error("Invalid reference frame. Please choose 'map' or 'odom'.")
             self.destroy_node()
             rclpy.try_shutdown()
 
+        # Create the save path service
+        self.srv = self.create_service(SavePath, 'save_path', self.save_path_callback)
+
         self.path_coords = []
         self.marker.points = []
-        ws_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../.."))
-        self.file_path = os.path.join(ws_dir, "src", "teach_and_repeat", "path_saves", f"{self.path_name}.txt")
+        self.recording = False
 
-        self.get_logger().info("Path coordinates saver node initialized. Saving coordinates...")
+        self.get_logger().info("Press ENTER to start recording the path...")
+        threading.Thread(target=self.wait_for_keypress, daemon=True).start()
+
+    def wait_for_keypress(self):
+        input()
+        self.recording = True
+        self.get_logger().info("Recording started. Saving coordinates...")
         self.get_logger().info("Publishing markers to '/coords_marker'")
-        self.get_logger().info("Press CTRL + C to save path coords. Data will be saved as a .txt file to your current directory.")
+        self.get_logger().info("Call the '/save_path' service to save the coordinates.")
+        self.get_logger().info("Press CTRL + C to shut down.")
 
     def callback(self, msg):
         self.topic_msg = msg
-
-        # Maybe it's better create a timer to call the handling_path_coords function.
-        self.handling_path_coords()
+        if self.recording:
+            self.handling_path_coords()
 
     def handling_path_coords(self):
         point = Point()
-
         x = self.topic_msg.pose.pose.position.x
         y = self.topic_msg.pose.pose.position.y
 
@@ -95,7 +95,25 @@ class TeachPathCoords(Node):
     def marker_publisher(self, point):
         self.marker.points.append(point)
         self.marker_pub.publish(self.marker)
-        
+
+    def save_path_callback(self, request, response):
+        try:
+            if request.path_name != "":
+                self.path_name = request.path_name
+            else:
+                self.path_name = 'path_coords'
+            ws_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../.."))
+            self.file_path = os.path.join(ws_dir, "src", "teach_and_repeat", "path_saves", f"{self.path_name}.txt")
+            save_coords_to_file(self.file_path, self.path_coords)
+            request.path_name = self.path_name
+            response.success = True
+            response.message = f"Path named {self.path_name} saved successfully on {self.file_path}."
+        except Exception as e:
+            self.get_logger().error(f"Failed to save path: {str(e)}")
+            response.success = False
+            response.message = f"Error: {str(e)}"
+        return response
+
 def main(args=None):
     rclpy.init(args=args)
     path_coords = TeachPathCoords()
@@ -103,12 +121,9 @@ def main(args=None):
     try:
         rclpy.spin(path_coords)
     except KeyboardInterrupt:
-        print("\nKeyboardInterrupt detected. Saving path and shutting down...")
+        print("\nKeyboardInterrupt detected. Shutting down without saving...")
     finally:
-        save_coords_to_file(path_coords.file_path, path_coords.path_coords)
-        print(f"\nPath saved: {path_coords.path_name}.")
         path_coords.destroy_node()
-        
         rclpy.try_shutdown()
 
 if __name__ == '__main__':
