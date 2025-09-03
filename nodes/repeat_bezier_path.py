@@ -15,12 +15,7 @@ from visualization_msgs.msg import Marker
 from geometry_msgs.msg import Point, Twist, PoseWithCovarianceStamped, PoseStamped
 
 from copy_file import copy_file
-from compare_paths import compare_paths
-from points_at_interval import points_at_interval
-from save_coords_to_file import save_coords_to_file
 from tf_transformations import euler_from_quaternion
-from generate_bezier_curve import generate_bezier_curve
-from save_variables_to_file import save_variables_to_file
 from compare_bezier_lookahead import compare_bezier_lookahead
 from create_folder_with_datetime import create_folder_with_datetime
 
@@ -35,14 +30,14 @@ from utils import getPointsFromFile, pointsToPoseStamped, posesToPath
 # TODO: Max error tolerance on Bezier curve generation
 # TODO: Automatic initial pose
 
-class BezierLookaheadWindowPlanner(Node):
+class LookaheadLocalPlanner(Node):
     '''
-    Path following behavior using Bézier curves.
+    Local Planner implementation
     '''
     def __init__(self):
-        super().__init__('bezier_lookahead_window_planner')
-        self.bezier_curve_marker_pub = self.create_publisher(Marker, 'bezier_curve_marker', 10)
-        self.bezier_points_marker_pub = self.create_publisher(Marker, 'bezier_points_marker', 10)
+        super().__init__('path_lookahead_window_planner')
+        self.path_curve_marker_pub = self.create_publisher(Marker, 'path_curve_marker', 10)
+        self.path_points_marker_pub = self.create_publisher(Marker, 'path_points_marker', 10)
         self.lookahead_paths_marker_pub = self.create_publisher(Marker, 'lookahead_paths_marker', 10)
         self.selected_lookahead_path_marker_pub = self.create_publisher(Marker, 'selected_lookahead_path_marker', 10)
 
@@ -58,6 +53,7 @@ class BezierLookaheadWindowPlanner(Node):
         self.max_vel_x = 0.2
         self.max_vel_theta = 1.0
         self.min_vel_theta = -self.max_vel_theta
+        self.max_distance_from_path = 1.0
 
         # threshold_dist btw tractor and coord
         self.threshold_dist = 0.8
@@ -74,9 +70,6 @@ class BezierLookaheadWindowPlanner(Node):
         self.tractor_position = 0.0
         self.desired_steering_angle = 0.0
         
-        # Follow curves
-        self.coords_during_following = []
-
         # Cofiguração do marker dos paths do lookahead
         self.lookahead_paths_marker = Marker()
         self.lookahead_paths_marker.header.frame_id = frame_id
@@ -93,7 +86,7 @@ class BezierLookaheadWindowPlanner(Node):
         # Configuração do marker que mostra o path da curva de esterçamento selecionada
         self.selected_lookahead_path_marker = Marker()
         self.selected_lookahead_path_marker.header.frame_id = frame_id
-        self.selected_lookahead_path_marker.type = Marker.LINE_STRIP
+        self.selected_lookahead_path_marker.type = Marker.LINE_LIST
         self.selected_lookahead_path_marker.action = Marker.ADD
         self.selected_lookahead_path_marker.pose.orientation.w = 1.0
         self.selected_lookahead_path_marker.scale.x = 0.01
@@ -103,33 +96,33 @@ class BezierLookaheadWindowPlanner(Node):
         self.selected_lookahead_path_marker.color.b = 0.0
         self.selected_lookahead_path_marker.color.a = 1.0
 
-        # Cofiguração do marker da curva de bezier
+        # Cofiguração do marker da curva de path
         # TODO: Add marker timer or timeout
 
-        self.bezier_curve_marker = Marker()
-        self.bezier_curve_marker.header.frame_id = frame_id
-        self.bezier_curve_marker.type = Marker.LINE_STRIP
-        self.bezier_curve_marker.action = Marker.ADD
-        self.bezier_curve_marker.pose.orientation.w = 1.0
-        self.bezier_curve_marker.scale.x = 0.01
-        self.bezier_curve_marker.scale.y = 0.1
-        self.bezier_curve_marker.color.r = 1.0
-        self.bezier_curve_marker.color.g = 0.0
-        self.bezier_curve_marker.color.b = 0.0
-        self.bezier_curve_marker.color.a = 1.0
+        self.path_curve_marker = Marker()
+        self.path_curve_marker.header.frame_id = frame_id
+        self.path_curve_marker.type = Marker.LINE_STRIP
+        self.path_curve_marker.action = Marker.ADD
+        self.path_curve_marker.pose.orientation.w = 1.0
+        self.path_curve_marker.scale.x = 0.01
+        self.path_curve_marker.scale.y = 0.1
+        self.path_curve_marker.color.r = 1.0
+        self.path_curve_marker.color.g = 0.0
+        self.path_curve_marker.color.b = 0.0
+        self.path_curve_marker.color.a = 1.0
 
-        # Cofiguração do marker que mostra os pontos na curva de bezier
-        self.bezier_points_marker = Marker()
-        self.bezier_points_marker.header.frame_id = frame_id
-        self.bezier_points_marker.type = Marker.POINTS
-        self.bezier_points_marker.action = Marker.ADD
-        self.bezier_points_marker.pose.orientation.w = 1.0
-        self.bezier_points_marker.scale.x = 0.05
-        self.bezier_points_marker.scale.y = 0.05
-        self.bezier_points_marker.color.r = 1.0
-        self.bezier_points_marker.color.g = 1.0
-        self.bezier_points_marker.color.b = 0.0
-        self.bezier_points_marker.color.a = 1.0
+        # Cofiguração do marker que mostra os pontos na curva de path
+        self.path_points_marker = Marker()
+        self.path_points_marker.header.frame_id = frame_id
+        self.path_points_marker.type = Marker.POINTS
+        self.path_points_marker.action = Marker.ADD
+        self.path_points_marker.pose.orientation.w = 1.0
+        self.path_points_marker.scale.x = 0.05
+        self.path_points_marker.scale.y = 0.05
+        self.path_points_marker.color.r = 1.0
+        self.path_points_marker.color.g = 1.0
+        self.path_points_marker.color.b = 0.0
+        self.path_points_marker.color.a = 1.0
 
         # Cria a pasta com data e horário e copia os arquivos
         # necessários para essa pasta
@@ -148,10 +141,7 @@ class BezierLookaheadWindowPlanner(Node):
         # foi teleoperado.
         self.file_teleop_path = os.path.join(base_to_create_folder, "path.txt")
         # teleop_path_points = read_points_from_file(self.file_teleop_path)
-        points = getPointsFromFile(self.file_teleop_path)
-        poses_stamped = pointsToPoseStamped(points)
-        # path = posesToPath(poses_stamped)
-        self.bezier_path_coords = points
+        self.path_points = getPointsFromFile(self.file_teleop_path)
 
         # Mostra a curva de Bézier
         self.showPath()
@@ -161,7 +151,7 @@ class BezierLookaheadWindowPlanner(Node):
 
         # Seta o valor inicial de algumas variáveis
         self.new_min = 0
-        self.bezier_few_points = 0.0
+        self.path_few_points = 0.0
         self.new_max = self.points_per_paths
 
         self.start_time = time.time()
@@ -187,8 +177,6 @@ class BezierLookaheadWindowPlanner(Node):
         self.quaternion = msg.pose.pose.orientation
         quaternion_list = [self.quaternion.x, self.quaternion.y, self.quaternion.z, self.quaternion.w]
         _, _, self.tractor_yaw = euler_from_quaternion(quaternion_list)
-
-        self.coords_during_following.append(point)
 
         self.update()
 
@@ -227,9 +215,9 @@ class BezierLookaheadWindowPlanner(Node):
         self.lookahead_paths_marker_pub.publish(self.lookahead_paths_marker)
 
         # Seleciona o melhor path local
-        self.bezier_few_points = self.bezier_path_coords[self.new_min:self.new_max]
+        self.path_few_points = self.path_points[self.new_min:self.new_max]
         for angle, lookahead_points in self.lookahead_updated.items():
-            cost = compare_bezier_lookahead(lookahead_points, self.bezier_few_points, self.points_per_paths)
+            cost = compare_bezier_lookahead(lookahead_points, self.path_few_points, self.points_per_paths)
             if min_cost is None or cost < min_cost:
                 min_cost = cost
                 self.desired_steering_angle = angle
@@ -240,6 +228,14 @@ class BezierLookaheadWindowPlanner(Node):
         msg.angular.z = self.desired_steering_angle
         self.cmd_vel_pub.publish(msg)
 
+        # Atribui para a variável os pontos a frente da curva de Bézier
+        for p in self.path_few_points:
+            selected_point = Point()
+            selected_point.x, selected_point.y = p[0], p[1]
+            self.path_points_marker.points.append(selected_point)
+
+        self.path_points_marker_pub.publish(self.path_points_marker)
+
         # Publica marker do path selecionado
         self.selected_lookahead_path_marker.points = []
         for p in self.best_lookahead_path:
@@ -249,8 +245,8 @@ class BezierLookaheadWindowPlanner(Node):
         self.selected_lookahead_path_marker_pub.publish(self.selected_lookahead_path_marker)
 
         # Atualiza controle dos pontos da curva
-        if np.any(self.bezier_few_points):
-            dist_tractor_from_point = np.linalg.norm(self.bezier_few_points[0] - self.tractor_position)
+        if np.any(self.path_few_points):
+            dist_tractor_from_point = np.linalg.norm(self.path_few_points[0] - self.tractor_position)
             if dist_tractor_from_point < self.threshold_dist:
                 self.new_min += 1
                 self.new_max += 1
@@ -259,11 +255,28 @@ class BezierLookaheadWindowPlanner(Node):
             msg.angular.z = 0.0
             self.cmd_vel_pub.publish(msg)
             sys.exit()
+        self.lookahead_updated.clear()
+        self.selected_lookahead_path_marker.points = []
+        self.lookahead_paths_marker.points = []
+        self.path_points_marker.points = []
+
+    def updateReferencePoints(self):
+        '''
+        @brief Update reference points on the path based on robot's position.
+        '''
+        if np.any(self.path_few_points):
+            dist_tractor_from_point = np.linalg.norm(self.path_few_points[0] - self.tractor_position)
+            if dist_tractor_from_point < self.threshold_dist:
+                self.new_min += 1
+                self.new_max += 1
+        pass
 
     def futureBehavior(self):
         '''
         Gera os lookahead paths diretamente em coordenadas relativas do robô.
         Integra usando velocidade linear (v) e velocidade angular (omega).
+
+        TODO: Add kinematics
         '''
         lookahead_dict = dict()
 
@@ -292,19 +305,19 @@ class BezierLookaheadWindowPlanner(Node):
 
 
     def showPath(self):
-        for p in self.bezier_path_coords:
+        for p in self.path_points:
             point = Point()
             point.x = p[0]
             point.y = p[1]
-            self.bezier_curve_marker.points.append(point)
+            self.path_curve_marker.points.append(point)
 
-        self.bezier_curve_marker_pub.publish(self.bezier_curve_marker)
+        self.path_curve_marker_pub.publish(self.path_curve_marker)
 
 def main(args=None):
     rclpy.init(args=args)
-    bezier_lookahead_window_planner = BezierLookaheadWindowPlanner()
-    rclpy.spin(bezier_lookahead_window_planner)
-    bezier_lookahead_window_planner.destroy_node()
+    path_lookahead_window_planner = LookaheadLocalPlanner()
+    rclpy.spin(path_lookahead_window_planner)
+    path_lookahead_window_planner.destroy_node()
     rclpy.shutdown()
 
 if __name__ == '__main__':
