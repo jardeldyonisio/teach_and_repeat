@@ -14,6 +14,7 @@ from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
 from visualization_msgs.msg import Marker
 from geometry_msgs.msg import Point, Twist, PoseWithCovarianceStamped
+from nav_msgs.msg import Odometry
 
 from rclpy.qos import qos_profile_sensor_data
 
@@ -46,18 +47,18 @@ class RepeatBezierPath(Node):
 
         self.cmd_vel_pub = self.create_publisher(Twist, 'cmd_vel', 10)
 
-        self.odom_sub = self.create_subscription(PoseWithCovarianceStamped, '/amcl_pose', self.callback_odometry, 10)
+        self.odom_sub = self.create_subscription(Odometry, '/odom', self.callback_odometry, 10)
         self.scan_sub = self.create_subscription(LaserScan, 'scan', self.callback_scan, qos_profile_sensor_data)
 
         # Frame ID. If you are using only relatyve data 
         # (IMU, Odometry, etc) you can use 'odom'.
-        frame_id = 'map'
+        frame_id = 'odom'
 
         # Constante velocity
         self.tractor_velocity = 0.2
 
         # threshold_dist btw tractor and coord
-        self.threshold_dist = 0.8
+        self.threshold_dist = 0.55
 
         self.tyre_radius = 0.0775
 
@@ -66,7 +67,7 @@ class RepeatBezierPath(Node):
 
         # Future Behavior Parameters
         self.points_per_paths = 15
-        self.dist_btw_points = 0.2
+        self.dist_btw_points = 0.1
         self.lookahead_total_paths = 100
 
         # Simulation
@@ -143,21 +144,21 @@ class RepeatBezierPath(Node):
         # When use path absolute the path is on install folder, so joint there
         # and go back to the root folder of the project
         ws_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../.."))
-        package_src_path = os.path.join(ws_dir, "src", "lognav", "teach_and_repeat")
+        package_src_path = os.path.join(ws_dir, "src", "teach_and_repeat")
         base_to_create_folder = os.path.join(package_src_path, "data/")
 
-        path_folder_to_copy = os.path.join(base_to_create_folder, "teleop_data.txt")
+        path_folder_to_copy = os.path.join(base_to_create_folder, "path_eight.txt")
         self.folder_path = create_folder_with_datetime(base_to_create_folder)
         copy_file(path_folder_to_copy, self.folder_path)
 
         # Coleta dados de posição de quando o veiculo
         # foi teleoperado.
-        self.file_teleop_path = os.path.join(base_to_create_folder, "teleop_data.txt")
+        self.file_teleop_path = os.path.join(base_to_create_folder, "path_eight.txt")
         teleop_path_points = read_points_from_file(self.file_teleop_path)
 
         # Define número inicial de knots para a curva
         # de Bézier.
-        self.start_num_knots = 200
+        self.start_num_knots = 300
         
         # Retorna os pontos de controle para os pontos
         # enviados.
@@ -204,7 +205,7 @@ class RepeatBezierPath(Node):
     def callback_scan(self, msg : LaserScan):
         self.obstacle_stop(msg.ranges)
 
-    def callback_odometry(self, msg : PoseWithCovarianceStamped):
+    def callback_odometry(self, msg : Odometry):
         self.x = msg.pose.pose.position.x
         self.y = msg.pose.pose.position.y
 
