@@ -1,4 +1,4 @@
-
+import numpy as np
 class BsplineSmoother:
     '''
     @brief Class for fitting Piecewise G1 Bezier curves to trajectory data.
@@ -34,3 +34,9 @@ class BsplineSmoother:
         @return numpy.ndarray: The smoothed Bezier curve points.
         '''
         return self.bspline_fit.getBezierPoints()
+
+    def publishGlobalPathSmooth(self):
+        '''
+        @brief Publish the smoothed global path on the appropriate ROS2 topic.
+        '''
+        pass

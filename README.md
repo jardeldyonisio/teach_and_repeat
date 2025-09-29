@@ -182,10 +182,12 @@ For more details, refer to our publication [Teach and Repeat for Path Planning U
   - [x] Create a service to save path.
 - [x] Display poses during the teaching process.
 - [ ] Show the circular threshold around the closest Bézier reference point.
-- [x] Automatically calculate `start_num_knots` based on the path.
 - [ ] Adjust the repeat bezier path node to work with different path names
 - [ ] Repeat nodes do not use NumPy correctly — for example, they calculate the distance between two points without using `numpy.linalg.norm`
 - [ ] `setup.py` instead of `CMakeLists.txt`
 - [ ] C++ version;
 - [ ] Variable linear velocity
 - [ ] Create a `.yaml` config in the same pattern of nav2 stack
+- [ ] Improve package organization based on ROS2 pattern;
+- [ ] Define license
+- [ ] Estimate trailer pose based on tugger movements and sensors

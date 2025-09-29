@@ -31,20 +31,18 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 
 install(
   PROGRAMS
-  scripts/utils.py
-  scripts/copy_file.py
-  scripts/get_jacobian.py
-  scripts/compare_paths.py
-  nodes/teach_path_coords.py
-  scripts/points_at_interval.py
-  nodes/repeat_path_coords.py
-  scripts/generate_lookahead.py
-  nodes/repeat_bezier_path.py
-  scripts/save_coords_to_file.py
-  scripts/generate_bezier_curve.py
-  scripts/save_variables_to_file.py
-  scripts/compare_bezier_lookahead.py
-  scripts/create_folder_with_datetime.py
+  src/utils.py
+  src/copy_file.py
+  src/compare_paths.py
+  node/teach_path.py
+  src/points_at_interval.py
+  node/local_planner.py
+  src/generate_lookahead.py
+  src/save_coords_to_file.py
+  src/generate_bezier_curve.py
+  src/save_variables_to_file.py
+  src/compare_bezier_lookahead.py
+  src/create_folder_with_datetime.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
@@ -54,10 +52,14 @@ install( DIRECTORY launch/
          DESTINATION share/${PROJECT_NAME}/launch)
 install( DIRECTORY path_saves/
          DESTINATION share/${PROJECT_NAME}/path_saves)
-install( DIRECTORY nodes/
-         DESTINATION share/${PROJECT_NAME}/nodes)
+install( DIRECTORY node/
+         DESTINATION share/${PROJECT_NAME}/node)
 install( DIRECTORY param/
-         DESTINATION share/${PROJECT_NAME}/param) 
+         DESTINATION share/${PROJECT_NAME}/param)
+install( DIRECTORY src/
+         DESTINATION share/${PROJECT_NAME}/src)
+install( DIRECTORY bspline_smoother/
+         DESTINATION share/${PROJECT_NAME}/bspline_smoother)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
