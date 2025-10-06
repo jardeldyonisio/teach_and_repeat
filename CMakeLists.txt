@@ -12,7 +12,7 @@ if(NOT CMAKE_CXX_STANDARD)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic)
+add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
 install(
@@ -33,6 +33,7 @@ install(
   scripts/read_coords_from_file.py
   scripts/save_variables_to_file.py
   scripts/compare_bezier_lookahead.py
+  scripts/utils.py
   scripts/create_folder_with_datetime.py
   src/PiecewiseG1BezierFit/scripts/pltC.py
   src/PiecewiseG1BezierFit/scripts/defk.py
@@ -62,6 +63,15 @@ install(
   DESTINATION lib/${PROJECT_NAME}
 )
 
+  # find dependencies
+  find_package(ament_cmake REQUIRED)
+  find_package(rosidl_default_generators REQUIRED)
+  # Messages and services
+  rosidl_generate_interfaces(${PROJECT_NAME}
+  "srv/SavePath.srv"
+  DEPENDENCIES
+  )
+
 # find dependencies
 find_package(ament_cmake REQUIRED)
 # uncomment the following section in order to fill in
@@ -77,7 +87,9 @@ install( DIRECTORY launch/
 install( DIRECTORY path_saves/
          DESTINATION share/${PROJECT_NAME}/path_saves)
 install( DIRECTORY nodes/
-         DESTINATION share/${PROJECT_NAME}/nodes) 
+         DESTINATION share/${PROJECT_NAME}/nodes)
+install( DIRECTORY srv/
+         DESTINATION share/${PROJECT_NAME}/srv)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
