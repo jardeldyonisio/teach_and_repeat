@@ -1,0 +1,13 @@
+{
+  "docks": [
+    {
+      "name": "doca_master",
+      "x": 2.6687827875400614,
+      "y": 2.274581863783275,
+      "yaw": -0.15708525450996474
+    }
+  ],
+  "total_docks": 1,
+  "reference_frame": "map",
+  "teach_orientation": true
+}
